@@ -413,8 +413,19 @@
         }
 
         setTimeout(() => {
+          if (tg && typeof tg.sendData === 'function') {
+            try {
+              tg.sendData(JSON.stringify({ deviceId }));
+              return;
+            } catch (e) {
+              console.warn('sendData fallback to link:', e);
+            }
+          }
           if (tg && typeof tg.openTelegramLink === 'function') {
             tg.openTelegramLink(botUrl);
+            setTimeout(() => {
+              try { if (typeof tg.close === 'function') tg.close(); } catch (e) {}
+            }, 500);
           } else {
             window.location.href = botUrl;
           }
